@@ -58,6 +58,34 @@ cd backend
 node server.js
 ```
 
+## Vercel Deployment
+
+### Frontend (Vercel)
+Set your project root to `frontend` and configure:
+
+```env
+VITE_PAYSTACK_PUBLIC_KEY=pk_live_or_test_key
+VITE_API_URL=https://your-backend-domain.vercel.app
+```
+
+### Backend (Vercel)
+Set your project root to `backend`.
+
+This project already includes:
+- `api/index.js` (Vercel function entry point)
+- `vercel.json` (routes all requests to Express app)
+
+Set backend environment variables:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+PAYSTACK_SECRET_KEY=sk_live_or_test_key
+NODE_ENV=production
+```
+
+After deployment, use your backend Vercel URL as `VITE_API_URL` in frontend.
+
 ## Testing
 
 ### With Paystack Test Keys:

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import PaymentModal from './PaymentModal';
+import { apiUrl } from '../lib/api';
 
 interface Booking {
   _id: string;
@@ -34,7 +35,7 @@ export default function BookingsPage() {
     const fetchUserEmail = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/auth/me', {
+        const response = await fetch(apiUrl('/api/auth/me'), {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.ok) {
@@ -56,7 +57,7 @@ export default function BookingsPage() {
         window.location.href = '/signin';
         return;
       }
-      const response = await fetch('http://localhost:5000/api/bookings', {
+      const response = await fetch(apiUrl('/api/bookings'), {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
@@ -85,7 +86,7 @@ export default function BookingsPage() {
         payload.paymentReference = paymentReference;
         payload.paymentStatus = 'completed';
       }
-      const res = await fetch(`http://localhost:5000/api/bookings/${bookingId}`, {
+      const res = await fetch(apiUrl(`/api/bookings/${bookingId}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

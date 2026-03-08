@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { StarIcon } from '../icons/gyl-icons';
 import { useForm } from 'react-hook-form';
+import { apiUrl } from '../lib/api';
 
 interface Mechanic {
   _id: string;
@@ -72,7 +73,7 @@ export default function MechanicDashboard() {
       }
 
       // Load mechanic profile
-      const profileResponse = await fetch('http://localhost:5000/api/mechanics/profile', {
+      const profileResponse = await fetch(apiUrl('/api/mechanics/profile'), {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -88,7 +89,7 @@ export default function MechanicDashboard() {
       }
 
       // Load bookings
-      const bookingsResponse = await fetch('http://localhost:5000/api/bookings', {
+      const bookingsResponse = await fetch(apiUrl('/api/bookings'), {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -107,7 +108,7 @@ export default function MechanicDashboard() {
   const onProfileUpdate = async (data: any) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/mechanics/profile', {
+      const response = await fetch(apiUrl('/api/mechanics/profile'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +131,7 @@ export default function MechanicDashboard() {
   const onServiceAdd = async (data: any) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/services', {
+      const response = await fetch(apiUrl('/api/services'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +157,7 @@ export default function MechanicDashboard() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/services/${serviceId}`, {
+      const response = await fetch(apiUrl(`/api/services/${serviceId}`), {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -175,7 +176,7 @@ export default function MechanicDashboard() {
   const updateBookingStatus = async (bookingId: string, status: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}`, {
+      const response = await fetch(apiUrl(`/api/bookings/${bookingId}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

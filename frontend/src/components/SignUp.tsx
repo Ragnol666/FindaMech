@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { LocationIcon } from '../icons/gyl-icons';
+import { apiUrl } from '../lib/api';
 
 export default function SignUp() {
   const [userType, setUserType] = useState('user');
@@ -77,7 +78,7 @@ export default function SignUp() {
         }
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData)

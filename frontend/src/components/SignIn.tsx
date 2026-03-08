@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { apiUrl } from '../lib/api';
 
 export default function SignIn() {
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -10,7 +11,7 @@ export default function SignIn() {
 
   const onSubmit = async (data: any) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

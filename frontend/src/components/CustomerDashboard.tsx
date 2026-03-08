@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LocationIcon, StarIcon, WhatsappIcon, MobileIcon } from '../icons/gyl-icons';
 import { useForm } from 'react-hook-form';
+import { apiUrl } from '../lib/api';
 
 interface Mechanic {
   _id: string;
@@ -69,7 +70,7 @@ export default function CustomerDashboard() {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/me', {
+      const response = await fetch(apiUrl('/api/auth/me'), {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -126,7 +127,7 @@ export default function CustomerDashboard() {
     try {
       console.log('Fetching nearby mechanics for location:', location);
       const response = await fetch(
-        `http://localhost:5000/api/mechanics/nearby?lat=${location.lat}&lng=${location.lng}&maxDistance=50000`
+        apiUrl(`/api/mechanics/nearby?lat=${location.lat}&lng=${location.lng}&maxDistance=50000`)
       );
       console.log('Nearby mechanics response:', response);
 
@@ -147,7 +148,7 @@ export default function CustomerDashboard() {
   const loadAllMechanics = async () => {
     try {
       console.log('Fetching all mechanics...');
-      const response = await fetch('http://localhost:5000/api/mechanics/all');
+      const response = await fetch(apiUrl('/api/mechanics/all'));
       console.log('All mechanics response:', response);
 
       if (response.ok) {
@@ -201,7 +202,7 @@ export default function CustomerDashboard() {
         notes: data.notes
       };
 
-      const response = await fetch('http://localhost:5000/api/bookings', {
+      const response = await fetch(apiUrl('/api/bookings'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
