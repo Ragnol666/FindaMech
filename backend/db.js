@@ -13,12 +13,27 @@ async function connectToDatabase() {
       process.env.MONGODB_URI ||
       'mongodb://localhost:27017/findamech';
 
+    if (!mongoUri) {
+      throw new Error('Missing MongoDB connection string (MONGO_URI)');
+    }
+
     cachedConnectionPromise = mongoose.connect(mongoUri, {
       maxPoolSize: 10,
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
+      tls: true,
+      family: 4,
     });
   }
 
-  await cachedConnectionPromise;
+  try {
+    await cachedConnectionPromise;
+  } catch (error) {
+    // Allow subsequent requests to retry a fresh connection.
+    cachedConnectionPromise = undefined;
+    throw error;
+  }
+
   return mongoose.connection;
 }
 

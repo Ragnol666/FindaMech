@@ -20,6 +20,10 @@ app.use(
 );
 app.use(express.json());
 
+app.get('/api/health', (_req, res) => {
+  res.send({ status: 'ok' });
+});
+
 // Ensure DB connection before handling API requests.
 app.use(async (_req, res, next) => {
   try {
@@ -36,10 +40,6 @@ const authRoutes = require('./routes/auth');
 const serviceRoutes = require('./routes/services');
 const bookingRoutes = require('./routes/bookings');
 const mechanicRoutes = require('./routes/mechanics');
-
-app.get('/api/health', (_req, res) => {
-  res.send({ status: 'ok' });
-});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
