@@ -11,7 +11,7 @@ async function connectToDatabase() {
     const mongoUri =
       process.env.MONGO_URI ||
       process.env.MONGODB_URI ||
-      'mongodb://localhost:27017/findamech';
+      'mongodb+srv://gilbertgeorge_db_user:grizzle22@cluster0.vqpym0x.mongodb.net/findamech?retryWrites=true&w=majority';
 
     if (!mongoUri) {
       throw new Error('Missing MongoDB connection string (MONGO_URI)');
