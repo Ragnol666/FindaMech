@@ -1,40 +1,45 @@
 const mongoose = require('mongoose');
 
-let cachedConnectionPromise;
+// Use global to persist the promise across hot-reloads in development
+// and across function invocations in Vercel.
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
 async function connectToDatabase() {
-  if (mongoose.connection.readyState === 1) {
-    return mongoose.connection;
+  if (cached.conn) {
+    return cached.conn;
   }
 
-  if (!cachedConnectionPromise) {
-    const mongoUri =
-      process.env.MONGO_URI ||
-      process.env.MONGODB_URI ||
-      'mongodb+srv://gilbertgeorge_db_user:grizzle22@cluster0.vqpym0x.mongodb.net/findamech?retryWrites=true&w=majority';
-
-    if (!mongoUri) {
-      throw new Error('Missing MongoDB connection string (MONGO_URI)');
-    }
-
-    cachedConnectionPromise = mongoose.connect(mongoUri, {
+  if (!cached.promise) {
+    const opts = {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 15000,
       connectTimeoutMS: 15000,
-      tls: true,
-      family: 4,
+      bufferCommands: false, // Recommended for serverless
+    };
+
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+    if (!mongoUri) {
+      throw new Error('Please define the MONGODB_URI environment variable inside .env.local or Vercel settings');
+    }
+
+    cached.promise = mongoose.connect(mongoUri, opts).then((mongoose) => {
+      return mongoose;
     });
   }
 
   try {
-    await cachedConnectionPromise;
-  } catch (error) {
-    // Allow subsequent requests to retry a fresh connection.
-    cachedConnectionPromise = undefined;
-    throw error;
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null; // Reset promise on error so next request can retry
+    throw e;
   }
 
-  return mongoose.connection;
+  return cached.conn;
 }
 
 module.exports = connectToDatabase;
