@@ -11,25 +11,26 @@ require('./models/Review');
 
 dotenv.config();
 const app = express();
+
 // 1. Dynamic CORS Configuration
 const allowedOrigins = [
-  'https://finda-mech-pw82.vercel.app', // Production
+  'https://finda-mech-pw82.vercel.app', 
   'http://localhost:3000',
   'http://localhost:5173'
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
+    // Allow requests with no origin (like mobile apps)
     if (!origin) return callback(null, true);
-    
-    const isVercel = origin.endsWith('.vercel.app');
-    const isAllowed = allowedOrigins.includes(origin);
 
-    if (isVercel || isAllowed) {
+    // Check if origin is a vercel preview or in our allowed list
+    const isVercelPreview = origin.endsWith('.vercel.app');
+    const isLocal = allowedOrigins.includes(origin);
+
+    if (isVercelPreview || isLocal) {
       callback(null, true);
     } else {
-      console.log("Blocked by CORS:", origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -38,7 +39,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(cors(corsOptions));
+// IMPORTANT: Handle Preflight explicitly for Vercel
+app.options('*', cors());
+
 
 // 2. Explicitly handle Preflight (OPTIONS) requests
 app.options('*', cors(corsOptions));
