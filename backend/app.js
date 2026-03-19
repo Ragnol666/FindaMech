@@ -11,14 +11,32 @@ require('./models/Review');
 
 dotenv.config();
 const app = express();
+// 1. Dynamic CORS Configuration
+const allowedOrigins = [
+  'https://finda-mech-pw82.vercel.app', // Production
+  'http://localhost:3000',
+  'http://localhost:5173'
+];
 
-// 1. Better CORS Configuration
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'https://finda-mech-pw82.vercel.app', // Use your specific frontend URL
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    const isVercel = origin.endsWith('.vercel.app');
+    const isAllowed = allowedOrigins.includes(origin);
+
+    if (isVercel || isAllowed) {
+      callback(null, true);
+    } else {
+      console.log("Blocked by CORS:", origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-};
+}));
 
 app.use(cors(corsOptions));
 
