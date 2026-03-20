@@ -9,66 +9,43 @@ require('./models/Service');
 require('./models/Booking');
 require('./models/Review');
 
-dotenv.config();
+const express = require('express');
+const cors = require('cors');
+// ... other imports
+
 const app = express();
 
-// 1. Dynamic CORS Configuration
-const allowedOrigins = [
-  'https://finda-mech-pw82.vercel.app', 
-  'http://localhost:3000',
-  'http://localhost:5173'
-];
-
+// 1. Move CORS to the VERY TOP (Before EVERYTHING else)
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps)
-    if (!origin) return callback(null, true);
-
-    // Check if origin is a vercel preview or in our allowed list
-    const isVercelPreview = origin.endsWith('.vercel.app');
-    const isLocal = allowedOrigins.includes(origin);
-
-    if (isVercelPreview || isLocal) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // This tells the server to accept ANY origin that calls it
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// IMPORTANT: Handle Preflight explicitly for Vercel
+// 2. Explicitly handle OPTIONS requests immediately
 app.options('*', cors());
-
-
-// 2. Explicitly handle Preflight (OPTIONS) requests
-app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
-// 3. Health check should be ABOVE the DB middleware 
-// so you can test if the server is alive even if the DB is down
-app.get('/api/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', message: 'Server is running' });
+// 3. Health check (No DB check here)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
 });
 
-// 4. DB connection middleware
+// 4. Wrap your DB connection so it doesn't block the headers
 app.use(async (req, res, next) => {
-  // Skip DB check for health route if you want, but fine to keep for others
   try {
     await connectToDatabase();
     next();
   } catch (error) {
-    console.error('MongoDB connection error:', error.message);
-    // If DB fails, we still need to send CORS headers with the error
-    res.status(500).json({ 
-      message: 'Database connection failed',
-      error: error.message 
-    });
+    console.error('DB Error:', error.message);
+    // Even on error, CORS headers are already set by the middleware above
+    res.status(500).json({ error: 'Database connection failed' });
   }
 });
+
+// ... rest of your routes
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
