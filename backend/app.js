@@ -1,5 +1,16 @@
 const express = require('express');
 const cors = require('cors');
+const dotenv = require('dotenv');
+const connectToDatabase = require('./db');
+
+// Import models
+require('./models/User');
+require('./models/Service');
+require('./models/Booking');
+require('./models/Review');
+
+const express = require('express');
+const cors = require('cors');
 // ... other imports
 
 const app = express();
@@ -33,4 +44,12 @@ app.use(async (req, res, next) => {
   }
 });
 
-// ... your routes
+// ... rest of your routes
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/services', require('./routes/services'));
+app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/mechanics', require('./routes/mechanics'));
+
+module.exports = app;
