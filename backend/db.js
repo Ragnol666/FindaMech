@@ -8,6 +8,12 @@ if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
+const DEFAULT_LOCAL_URI = 'mongodb://127.0.0.1:27017/findamech';
+
+async function connectWithUri(uri, opts) {
+  return mongoose.connect(uri, opts);
+}
+
 async function connectToDatabase() {
   if (cached.conn) {
     return cached.conn;
@@ -21,15 +27,27 @@ async function connectToDatabase() {
       bufferCommands: false, // Recommended for serverless
     };
 
-    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+    const mongoCandidates = [process.env.MONGODB_URI || process.env.MONGO_URI, DEFAULT_LOCAL_URI].filter(Boolean);
 
-    if (!mongoUri) {
-      throw new Error('Please define the MONGODB_URI environment variable inside .env.local or Vercel settings');
-    }
+    const tryConnect = async (index) => {
+      const uri = mongoCandidates[index];
+      if (!uri) {
+        throw new Error('No MongoDB connection URI is available. Set MONGODB_URI or start a local MongoDB instance.');
+      }
 
-    cached.promise = mongoose.connect(mongoUri, opts).then((mongoose) => {
-      return mongoose;
-    });
+      try {
+        return await connectWithUri(uri, opts);
+      } catch (error) {
+        if (index < mongoCandidates.length - 1) {
+          console.warn(`MongoDB connection attempt failed for ${uri}: ${error.message}`);
+          return tryConnect(index + 1);
+        }
+
+        throw error;
+      }
+    };
+
+    cached.promise = tryConnect(0).then((mongooseInstance) => mongooseInstance);
   }
 
   try {

@@ -6,12 +6,17 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
+const startServer = () => {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+};
+
 connectToDatabase()
   .then(() => {
     console.log('MongoDB connected successfully');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    startServer();
   })
   .catch((error) => {
     console.error('MongoDB connection error:', error.message);
-    process.exit(1);
+    console.warn('Starting server without a database connection. Configure a valid MongoDB URI to enable data operations.');
+    startServer();
   });

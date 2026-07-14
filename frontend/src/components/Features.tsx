@@ -38,7 +38,7 @@ export default function Features() {
     <section id="features" className="py-20 bg-white">
       <div className="container mx-auto px-6">
         <h2 className="text-4xl font-bold text-center mb-16">Why Choose FindAMech?</h2>
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="p-8 border border-gray-200 rounded-lg hover:shadow-lg transition">
               <div className="text-4xl mb-4">{feature.icon}</div>

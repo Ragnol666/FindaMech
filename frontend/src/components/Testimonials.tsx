@@ -26,7 +26,7 @@ export default function Testimonials() {
     <section id="testimonials" className="py-20 bg-white">
       <div className="container mx-auto px-6">
         <h2 className="text-4xl font-bold text-center mb-16">What People Say</h2>
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
             <div key={index} className="p-8 border border-gray-200 rounded-lg">
               <div className="flex gap-1 mb-4">
